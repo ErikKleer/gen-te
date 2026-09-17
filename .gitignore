@@ -1,0 +1,10 @@
+node_modules/
+dist/
+coverage/
+*.test.ts
+!src/parser/ast.test.ts
+.github/
+.vscode/
+.env
+.env.*
+!.env.example

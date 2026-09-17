@@ -1,0 +1,32 @@
+{
+  "name": "gen-te",
+  "version": "0.1.0",
+  "description": "Generate Vitest tests for TypeScript files",
+  "type": "module",
+  "bin": {
+    "gen-te": "dist/bin/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run --exclude dist/**",
+    "start": "tsx bin/index.ts",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "@clack/prompts": "^0.11.0",
+    "@google/genai": "^1.16.0",
+    "chalk": "^5.6.0",
+    "commander": "^14.0.0",
+    "dotenv": "^17.4.2",
+    "execa": "^9.6.0",
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.0",
+    "vitest": "^4.1.11"
+  }
+}
