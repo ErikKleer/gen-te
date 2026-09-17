@@ -30,24 +30,56 @@ A useful test generator must connect AI-assisted generation to real test executi
 
 ## 🏛️ Solution Architecture
 
-```text
-TypeScript file
-   |
-   v
-AST signature extraction
-   |
-   v
-Gemini Flash test generation
-   |
-   v
-Generated .test.ts file
-   |
-   v
-Vitest execution
-   |
-   +--> Pass: finish
-   |
-   +--> Fail: repair with error log (max 3 attempts)
+```mermaid
+flowchart LR
+    subgraph AST_Stage ["1. AST Static Extraction"]
+        direction TB
+        A["Target TypeScript File<br/>(e.g., user.service.ts)"]
+        B["TypeScript Compiler API<br/>(Exported Function Signatures)"]
+        A --> B
+    end
+
+    subgraph LLM_Gen ["2. Agentic QA Engine"]
+        direction TB
+        C["Gemini<br/>(QA-Oriented Prompt)"]
+        D["Write Generated .test.ts File<br/>(Initial Vitest Suite)"]
+        C --> D
+    end
+
+    subgraph Runner_Loop ["3. Closed Feedback Loop (Max 3 Attempts)"]
+        direction TB
+        E["Execa Runner<br/>(npx vitest run &lt;file&gt; --run)"]
+        F{"Tests Passed?<br/>(Exit Code 0)"}
+        G["Success State<br/>(Clack Success &amp; Exit)"]
+        H["Capture stdout / stderr<br/>(Failure Trace Log)"]
+        J{"Attempts Remaining?"}
+        I["Human Intervention Required<br/>(After 3 Failed Attempts)"]
+
+        E --> F
+        F -- Yes --> G
+        F -- No --> H
+        H --> J
+        J -- Yes: repair --> C
+        J -- No --> I
+    end
+
+    B -- "Exported Signatures Only<br/>(Focused Prompt)" --> C
+    D --> E
+    H -- "Error Log + Current Test Code<br/>(Repair Context)" --> C
+
+    style AST_Stage fill:#0f172a,stroke:#38bdf8,stroke-width:1px,color:#fff
+    style LLM_Gen fill:#0f172a,stroke:#34d399,stroke-width:1px,color:#fff
+    style Runner_Loop fill:#0f172a,stroke:#f59e0b,stroke-width:1px,color:#fff
+
+    style A fill:#1e293b,stroke:#475569,stroke-width:1px,color:#fff
+    style B fill:#1e293b,stroke:#475569,stroke-width:1px,color:#fff
+    style C fill:#1e293b,stroke:#475569,stroke-width:1px,color:#fff
+    style D fill:#1e293b,stroke:#475569,stroke-width:1px,color:#fff
+    style E fill:#1e293b,stroke:#475569,stroke-width:1px,color:#fff
+    style F fill:#334155,stroke:#94a3b8,stroke-width:1px,color:#fff
+    style G fill:#064e3b,stroke:#10b981,stroke-width:2px,color:#fff
+    style H fill:#450a0a,stroke:#ef4444,stroke-width:1px,color:#fff
+    style I fill:#451a03,stroke:#f59e0b,stroke-width:1px,color:#fff
 ```
 
 ### 1. Signature extraction
